@@ -54,14 +54,16 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 					//						Label: "left",
 					//						Text:  "lllll",
 					//					}
-					rb := &linebot.PostbackTemplateAction{
-						Label: "right",
-						Data:  "rrrrr",
-					}
-					lb := &linebot.PostbackTemplateAction{
-						Label: "left",
-						Data:  "lllll",
-					}
+					//					rb := &linebot.PostbackTemplateAction{
+					//						Label: "right",
+					//						Data:  "rrrrr",
+					//					}
+					//					lb := &linebot.PostbackTemplateAction{
+					//						Label: "left",
+					//						Data:  "lllll",
+					//					}
+					rb := linebot.NewPostbackTemplateAction("right", "rrrrr", "")
+					lb := linebot.NewPostbackTemplateAction("left", "lllll", "")
 
 					temp := linebot.NewConfirmTemplate("aiueo", lb, rb)
 					msg := linebot.NewTemplateMessage("confilm", temp)
