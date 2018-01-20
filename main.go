@@ -56,6 +56,7 @@ type Template struct {
 }
 
 var (
+	FRate    int
 	bot      *linebot.Client
 	messages []linebot.Message
 	geometry Geocoding
@@ -148,7 +149,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				case "ごちそうさま！":
 					if _, err = bot.ReplyMessage(event.ReplyToken,
 						linebot.NewTextMessage("ごちそうさまでした"),
-						ReviewTemplate("https://i.imgur.com/oxoKeI5.png"), //<-変更
+						ReviewTemplate("https://i.imgur.com/oxoKeI5.png"),
 					).Do(); err != nil {
 						log.Print(err)
 					}
@@ -157,10 +158,18 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 					rand.Seed(time.Now().UnixNano())
 
 					if _, err = bot.ReplyMessage(event.ReplyToken,
-						SelectTemplate(comm[rand.Intn(3)]), //<-変更
+						SelectTemplate(comm[rand.Intn(3)]),
 					).Do(); err != nil {
 						log.Print(err)
 					}
+
+				case "（好感度）":
+					if _, err = bot.ReplyMessage(event.ReplyToken,
+						linebot.NewTextMessage(fmt.Sprintf("好感度: %d", FRate)),
+					).Do(); err != nil {
+						log.Print(err)
+					}
+
 				default:
 				}
 			case *linebot.LocationMessage:
@@ -223,6 +232,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				}
 
 			case "shiro2":
+				FRate++
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("peco 鶴ヶ城には詳しいんだぁ〜！"),
 					linebot.NewTextMessage("福島県会津若松市追手町にあった日本の城で、地元では鶴ヶ城（つるがじょう）と言うが、同名の城が他にあるため、地元以外では会津若松城と呼ばれることが多い。文献では旧称である黒川城（くろかわじょう）、または単に会津城とされることもある。国の史跡としては、若松城跡（わかまつじょうあと）の名称で指定されている。"),
@@ -272,6 +282,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				}
 
 			case "kyodo4":
+				FRate++
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("内陸の会津地方でも入手が可能な、海産物の乾物を素材とした汁物である。江戸時代後期から明治初期にかけて会津藩の武家料理や庶民のごちそうとして広まり、現在でも正月や冠婚葬祭などハレの席で、必ず振る舞われる郷土料理である。"),
 					linebot.NewImageMessage("https://i.imgur.com/uUWeU5G.jpg", "https://i.imgur.com/uUWeU5G.jpg"),
@@ -280,6 +291,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				}
 
 			case "men1":
+				FRate++
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("peco 喜多方ラーメン大好きなんだぁ！"),
 					linebot.NewTextMessage("喜多方ラーメン（きたかたラーメン）とは福島県喜多方市発祥のご当地ラーメン（ご当地グルメ）で、2006年（平成18年）1月の市町村合併前の旧喜多方市では人口37,000人あまりに対し120軒ほどのラーメン店があり、対人口比の店舗数では日本一であった。札幌ラーメン、博多ラーメンと並んで日本三大ラーメンの一つに数えられている。"),
