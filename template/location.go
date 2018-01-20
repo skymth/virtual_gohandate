@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -10,8 +11,36 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
+const (
+	endpoint = "https://maps.googleapis.com/maps/api/geocode/json?address="
+)
+
+type Geocoding struct {
+	Results []Geometry `json:"results"`
+}
+
+type Geometry struct {
+	GeoRes Location `json:"geometry"`
+}
+
+type Location struct {
+	Location locations `json:"location"`
+}
+
+type locations struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+type Locs struct {
+	Lat float64
+	Lng float64
+}
+
 var (
-	bot *linebot.Client
+	geometry Geocoding
+	key      = os.Getenv("GEOCODING_API")
+	bot      *linebot.Client
 )
 
 func main() {
@@ -22,6 +51,12 @@ func main() {
 	)
 	if err != nil {
 		log.Fatal(err)
+	}
+	//geocoding
+	loc := "３１９御山村上門田町大字会津若松市福島県"
+	url := endpoint + loc + "&key=" + key
+	if err := GeometReq(url); err != nil {
+		log.Print(err)
 	}
 
 	http.HandleFunc("/callback", ResponseCall)
@@ -45,12 +80,27 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 		case linebot.EventTypeMessage:
 			switch message := event.Message.(type) {
 			case *linebot.LocationMessage:
-				lat := strconv.FormatFloat(message.Latitude, 'f', 6, 64)
-				lon := strconv.FormatFloat(message.Longitude, 'f', 6, 64)
+				la := strconv.FormatFloat(message.Latitude, 'f', 6, 64)
+				lo := strconv.FormatFloat(message.Longitude, 'f', 6, 64)
+				lat, _ := strconv.ParseFloat(la, 64)
+				lon, _ := strconv.ParseFloat(lo, 64)
 
-				msg := fmt.Sprintf("緯度:%v\n経度:%v", lat, lon)
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(msg)).Do(); err != nil {
-					log.Print(err)
+				max := Locs{}
+				min := Locs{}
+				max.Lat = geometry.Results[0].GeoRes.Location.Lat + 0.0040000
+				max.Lng = geometry.Results[0].GeoRes.Location.Lng + 0.0020000
+
+				min.Lat = geometry.Results[0].GeoRes.Location.Lat - 0.0040000
+				min.Lng = geometry.Results[0].GeoRes.Location.Lng - 0.0020000
+
+				if (lat >= min.Lat && lat <= max.Lat) && (lon >= min.Lng && lon <= max.Lng) {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("近くにいるね")).Do(); err != nil {
+						log.Print(err)
+					}
+				} else {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("嘘つき！")).Do(); err != nil {
+						log.Print(err)
+					}
 				}
 			}
 
@@ -60,4 +110,24 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
+}
+
+func GeometReq(url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(respBody, &geometry)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
