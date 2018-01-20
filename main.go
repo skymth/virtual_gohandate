@@ -95,15 +95,21 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 						)).Do(); err != nil {
 						log.Print(err)
 					}
-				case "いただきます!":
+				case "いただきます！":
 					if _, err = bot.ReplyMessage(event.ReplyToken,
 						ButtonTemplate("https://i.imgur.com/tNxL35o.png", //<-変更
-							"いただきます！♪",
+							"いただきます♪",
 						)).Do(); err != nil {
 						log.Print(err)
 					}
 
-				case "ごちそうさまでした!":
+				case "ごちそうさま！":
+					if _, err = bot.ReplyMessage(event.ReplyToken,
+						linebot.NewTextMessage("ごちそうさまでした"),
+						ReviewTemplate("https://i.imgur.com/tNxL35o.png"), //<-変更
+					).Do(); err != nil {
+						log.Print(err)
+					}
 
 				default:
 				}
@@ -150,6 +156,12 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				).Do(); err != nil {
 					log.Print(err)
 				}
+			case "7":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("また、来ようね！！"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
 			default:
 			}
 		}
@@ -181,6 +193,7 @@ func ButtonTemplate(image, title string) *linebot.TemplateMessage {
 		image, //not image
 		title, //ButtonsTemplate Title
 		" ",   //ButtonsTemplate SubTitle
+		linebot.NewPostbackTemplateAction(" ", " ", ""),
 	)
 	msg := linebot.NewTemplateMessage("confilm", template)
 	return msg
@@ -193,6 +206,20 @@ func ButtonTemplate2(image, rb, lb, label, sublabel, no1, no2 string) *linebot.T
 		sublabel, //ButtonsTemplate SubTitle
 		linebot.NewPostbackTemplateAction(rb, no1, ""),
 		linebot.NewPostbackTemplateAction(lb, no2, ""),
+	)
+	msg := linebot.NewTemplateMessage("confilm", template)
+	return msg
+}
+
+func ReviewTemplate(image string) *linebot.TemplateMessage {
+	template := linebot.NewButtonsTemplate(
+		image, //not image
+		"美味しかったね！\n味はどうだった？", //ButtonsTemplate Title
+		" ", //ButtonsTemplate SubTitle
+		linebot.NewPostbackTemplateAction("★☆☆☆", "7", ""),
+		linebot.NewPostbackTemplateAction("★★☆☆", "7", ""),
+		linebot.NewPostbackTemplateAction("★★★☆", "7", ""),
+		linebot.NewPostbackTemplateAction("★★★★", "7", ""),
 	)
 	msg := linebot.NewTemplateMessage("confilm", template)
 	return msg
