@@ -168,6 +168,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			}
 
 		case linebot.EventTypePostback:
+			rand.Seed(time.Now().UnixNano())
 			switch event.Postback.Data {
 			case "1":
 				user.date = true
@@ -216,6 +217,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "shiro1":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("それはあんま興味ないなぁ〜〜..."),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -232,6 +234,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "shiro3":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("名古屋城かぁ〜名古屋城はあんまり詳しくないんだぁ〜"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -239,6 +242,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "shiro4":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("ルパ〜ン3世...だね！！！"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -246,6 +250,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "kyodo1":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("北海道の郷土料理だけどあんまわかんないや"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -253,6 +258,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "kyodo2":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("宮崎県の郷土料理だけどあんまわかんないや"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -260,6 +266,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "kyodo3":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("山梨県の郷土料理だけどあんまわかんないや"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -284,6 +291,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "men2":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -291,6 +299,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "men3":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
@@ -298,6 +307,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 			case "men4":
 				if _, err = bot.ReplyMessage(event.ReplyToken,
 					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+					linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1)),
 				).Do(); err != nil {
 					log.Print(err)
 				}
