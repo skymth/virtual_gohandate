@@ -97,7 +97,7 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 					}
 				case "いただきます！":
 					if _, err = bot.ReplyMessage(event.ReplyToken,
-						ButtonTemplate("https://i.imgur.com/tNxL35o.png", //<-変更
+						ButtonTemplate("https://i.imgur.com/97XRjTa.png", //<-変更
 							"いただきます♪",
 						)).Do(); err != nil {
 						log.Print(err)
@@ -106,11 +106,12 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				case "ごちそうさま！":
 					if _, err = bot.ReplyMessage(event.ReplyToken,
 						linebot.NewTextMessage("ごちそうさまでした"),
-						ReviewTemplate("https://i.imgur.com/tNxL35o.png"), //<-変更
+						ReviewTemplate("https://i.imgur.com/oxoKeI5.png"), //<-変更
 					).Do(); err != nil {
 						log.Print(err)
 					}
 
+				case "お話ししよう！":
 				default:
 				}
 			case *linebot.LocationMessage:
