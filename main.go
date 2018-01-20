@@ -2,11 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -42,12 +45,51 @@ type Locs struct {
 	Lng float64
 }
 
+type Template struct {
+	Title   string
+	image   string
+	select1 string
+	select2 string
+	select3 string
+	select4 string
+	key     string
+}
+
 var (
 	bot      *linebot.Client
 	messages []linebot.Message
 	geometry Geocoding
 	key      = os.Getenv("GEOCODING_API")
 	user     User
+	comm     = map[int]Template{
+		0: Template{
+			Title:   "なんのお話にする？",
+			image:   "https://i.imgur.com/iazlG5a.png",
+			select1: "大阪城？",
+			select2: "鶴ヶ城？",
+			select3: "名古屋城？",
+			select4: "カリオストロの城？",
+			key:     "shiro",
+		},
+		1: Template{
+			Title:   "なんの話にする？",
+			image:   "https://i.imgur.com/iazlG5a.png",
+			select1: "ちゃんちゃんやき", //北海道の郷土料理だけどあんまわかんないや
+			select2: "かにまき汁",    // 宮崎県の郷土料理だけどあんまわかんないや
+			select3: "イノシシカレー",  // 山梨県の郷土料理だけどあんまわかんないや
+			select4: "こづゆ",
+			key:     "kyodo",
+		},
+		2: Template{
+			Title:   "なんの話にする？",
+			image:   "https://i.imgur.com/iazlG5a.png",
+			select1: "喜多方ラーメン",
+			select2: "白河ラーメン",
+			select3: "博多ラーメン",
+			select4: "札幌ラーメン",
+			key:     "men",
+		},
+	}
 )
 
 func main() {
@@ -111,7 +153,14 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 						log.Print(err)
 					}
 
-				case "お話ししよう！":
+				case "お話しよう！":
+					rand.Seed(time.Now().UnixNano())
+
+					if _, err = bot.ReplyMessage(event.ReplyToken,
+						SelectTemplate(comm[rand.Intn(3)]), //<-変更
+					).Do(); err != nil {
+						log.Print(err)
+					}
 				default:
 				}
 			case *linebot.LocationMessage:
@@ -163,10 +212,114 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 				).Do(); err != nil {
 					log.Print(err)
 				}
+
+			case "shiro1":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("それはあんま興味ないなぁ〜〜..."),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "shiro2":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("peco 鶴ヶ城には詳しいんだぁ〜！"),
+					linebot.NewTextMessage("福島県会津若松市追手町にあった日本の城で、地元では鶴ヶ城（つるがじょう）と言うが、同名の城が他にあるため、地元以外では会津若松城と呼ばれることが多い。文献では旧称である黒川城（くろかわじょう）、または単に会津城とされることもある。国の史跡としては、若松城跡（わかまつじょうあと）の名称で指定されている。"),
+					linebot.NewImageMessage("https://i.imgur.com/nPejtHV.jpg", "https://i.imgur.com/nPejtHV.jpg"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "shiro3":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("名古屋城かぁ〜名古屋城はあんまり詳しくないんだぁ〜"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "shiro4":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("ルパ〜ン3世...だね！！！"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "kyodo1":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("北海道の郷土料理だけどあんまわかんないや"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "kyodo2":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("宮崎県の郷土料理だけどあんまわかんないや"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "kyodo3":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("山梨県の郷土料理だけどあんまわかんないや"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "kyodo4":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("内陸の会津地方でも入手が可能な、海産物の乾物を素材とした汁物である。江戸時代後期から明治初期にかけて会津藩の武家料理や庶民のごちそうとして広まり、現在でも正月や冠婚葬祭などハレの席で、必ず振る舞われる郷土料理である。"),
+					linebot.NewImageMessage("https://i.imgur.com/uUWeU5G.jpg", "https://i.imgur.com/uUWeU5G.jpg"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "men1":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("peco 喜多方ラーメン大好きなんだぁ！"),
+					linebot.NewTextMessage("喜多方ラーメン（きたかたラーメン）とは福島県喜多方市発祥のご当地ラーメン（ご当地グルメ）で、2006年（平成18年）1月の市町村合併前の旧喜多方市では人口37,000人あまりに対し120軒ほどのラーメン店があり、対人口比の店舗数では日本一であった。札幌ラーメン、博多ラーメンと並んで日本三大ラーメンの一つに数えられている。"),
+					linebot.NewImageMessage("https://i.imgur.com/w6kws4W.png", "https://i.imgur.com/w6kws4W.png"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "men2":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "men3":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
+			case "men4":
+				if _, err = bot.ReplyMessage(event.ReplyToken,
+					linebot.NewTextMessage("喜多方ラーメンの話ししようよ〜！！"),
+				).Do(); err != nil {
+					log.Print(err)
+				}
+
 			default:
 			}
 		}
 	}
+}
+
+func SelectTemplate(res Template) *linebot.TemplateMessage {
+	template := linebot.NewButtonsTemplate(
+		res.image, //not image
+		res.Title, //ButtonsTemplate Title
+		" ",       //ButtonsTemplate SubTitle
+		linebot.NewPostbackTemplateAction(res.select1, fmt.Sprintf("%s1", res.key), ""),
+		linebot.NewPostbackTemplateAction(res.select2, fmt.Sprintf("%s2", res.key), ""),
+		linebot.NewPostbackTemplateAction(res.select3, fmt.Sprintf("%s3", res.key), ""),
+		linebot.NewPostbackTemplateAction(res.select4, fmt.Sprintf("%s4", res.key), ""),
+	)
+	msg := linebot.NewTemplateMessage("confilm", template)
+	return msg
 }
 
 func CarouselTemplate() *linebot.TemplateMessage {
