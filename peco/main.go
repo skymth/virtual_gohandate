@@ -60,6 +60,9 @@ func (peco *Peco) Callback(w http.ResponseWriter, req *http.Request) {
 					log.Print(err)
 				}
 			case *linebot.LocationMessage:
+				if err := peco.locationResponse(message, event.ReplyToken); err != nil {
+					log.Print(err)
+				}
 			default:
 			}
 
@@ -113,6 +116,20 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 			log.Print(err)
 		}
 	default:
+	}
+	return nil
+}
+
+func (peco *Peco) locationResponse(message *linebot.LocationMessage, reply string) error {
+	resLocation, err := handleLocation(message.Latitude, message.Longitude)
+	if err != nil {
+		return err
+	}
+	if _, err := app.bot.ReplyMessage(
+		reply,
+		resLocation,
+	).Do(); err != nil {
+		return err
 	}
 	return nil
 }
