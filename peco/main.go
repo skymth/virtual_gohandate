@@ -1,13 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 
 	"github.com/line/line-bot-sdk-go/linebot"
+)
+
+const (
+	endpoint = "https://maps.googleapis.com/maps/api/geocode/json?address="
+)
+
+var (
+	key = os.Getenv("GEOCODING_API")
 )
 
 type Peco struct {
@@ -121,15 +131,23 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 }
 
 func (peco *Peco) locationResponse(message *linebot.LocationMessage, reply string) error {
-	resLocation, err := handleLocation(message.Latitude, message.Longitude)
+	resLocation, typ, err := handleLocation(message.Latitude, message.Longitude)
 	if err != nil {
 		return err
-	}
-	if _, err := app.bot.ReplyMessage(
-		reply,
-		resLocation,
-	).Do(); err != nil {
-		return err
+	} else if typ == true {
+		if _, err := peco.bot.ReplyMessage(
+			reply,
+			linebot.NewTextMessage(word["location"]),
+		).Do(); err != nil {
+			return err
+		}
+	} else {
+		if _, err := peco.bot.ReplyMessage(
+			reply,
+			resLocation,
+		).Do(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -165,9 +183,55 @@ func ButtonTemplate4(res buttonTemp4) *linebot.TemplateMessage {
 		linebot.NewPostbackTemplateAction(res.select3, formatStr(res.key, 3), ""),
 		linebot.NewPostbackTemplateAction(res.select4, formatStr(res.key, 4), ""),
 	)
-	return linebot.NewTemplateMessage("confilm", temp)
+	return linebot.NewTemplateMessage("button4", temp)
+}
+
+func handleLocation(lat, lon float64) (*linebot.TemplateMessage, bool, error) {
+	loc := "３１９御山村上門田町大字会津若松市福島県" //example adress
+	url := endpoint + loc + "&key=" + key
+	geo, err := GeometReq(url)
+	if err != nil {
+		return nil, false, err
+	}
+
+	max := Locs{
+		Lat: geo.Results[0].GeoRes.Location.Lat + 0.0040000,
+		Lng: geo.Results[0].GeoRes.Location.Lng + 0.0020000,
+	}
+	min := Locs{
+		Lat: geo.Results[0].GeoRes.Location.Lat - 0.0040000,
+		Lng: geo.Results[0].GeoRes.Location.Lng - 0.0020000,
+	}
+
+	if (lat >= min.Lat && lat <= max.Lat) && (lon >= min.Lng && lon <= max.Lng) {
+		return ButtonTemplate2(button2["location"]), false, nil
+	} else {
+		return nil, true, nil
+	}
+
 }
 
 func formatStr(str string, i int) string {
 	return fmt.Sprintf("%s%d", str, i)
+}
+
+func GeometReq(url string) (*Geocoding, error) {
+	var geo Geocoding
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(respBody, &geo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &geo, nil
 }

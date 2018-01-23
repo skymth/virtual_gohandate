@@ -5,6 +5,28 @@ import (
 	"time"
 )
 
+type Geocoding struct {
+	Results []Geometry `json:"results"`
+}
+
+type Geometry struct {
+	GeoRes Location `json:"geometry"`
+}
+
+type Location struct {
+	Location locations `json:"location"`
+}
+
+type locations struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+type Locs struct {
+	Lat float64
+	Lng float64
+}
+
 type buttonTemp struct {
 	image string
 	title string
@@ -36,6 +58,7 @@ var (
 	button2 map[string]buttonTemp2
 	button4 map[string]buttonTemp4
 	talk    map[int]buttonTemp4
+	word    map[string]string
 )
 
 func init() {
@@ -68,28 +91,28 @@ func init() {
 		},
 	}
 
-	button4 = map[string]buttonTemp4{
-		"": buttonTemp4{
-			key:     "",
-			title:   "",
-			image:   "",
-			label:   "",
-			select1: "",
-			select2: "",
-			select3: "",
-			select4: "",
-		},
-		"": buttonTemp4{
-			key:     "",
-			title:   "",
-			image:   "",
-			label:   "",
-			select1: "",
-			select2: "",
-			select3: "",
-			select4: "",
-		},
-	}
+	//	button4 = map[string]buttonTemp4{
+	//		"": buttonTemp4{
+	//			key:     "",
+	//			title:   "",
+	//			image:   "",
+	//			label:   "",
+	//			select1: "",
+	//			select2: "",
+	//			select3: "",
+	//			select4: "",
+	//		},
+	//		"": buttonTemp4{
+	//			key:     "",
+	//			title:   "",
+	//			image:   "",
+	//			label:   "",
+	//			select1: "",
+	//			select2: "",
+	//			select3: "",
+	//			select4: "",
+	//		},
+	//	}
 
 	talk = map[int]buttonTemp4{
 		0: buttonTemp4{
@@ -122,6 +145,10 @@ func init() {
 			select3: "博多ラーメン",
 			select4: "札幌ラーメン",
 		},
+	}
+
+	word = map[string]string{
+		"location": " 嘘つき！\n全然違う場所じゃない！！",
 	}
 
 }
