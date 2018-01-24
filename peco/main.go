@@ -77,9 +77,11 @@ func (peco *Peco) Callback(w http.ResponseWriter, req *http.Request) {
 			}
 
 		case linebot.EventTypePostback:
-			if err := peco.postbackResponse(message, event.ReplyToken); err != nil {
+			if err := peco.postbackResponse(event.Postback, event.ReplyToken); err != nil {
 				log.Print(err)
 			}
+		default:
+			log.Printf("Unknown: %v", event)
 		}
 	}
 }
@@ -142,6 +144,20 @@ func (peco *Peco) locationResponse(message *linebot.LocationMessage, reply strin
 			reply,
 			resLocation,
 		).Do(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func postbackResponse(p *linebot.Postback, reply string) error {
+	switch p.Data {
+	case "meshi1", "meshi2", "osusume2", "menu1", "menu2":
+		if err := messageResponse(reply, word[p.Data]); err != nil {
+			return err
+		}
+	case "osusume1":
+		if err := CarouselTemplate(reply, p.Data); err != nil {
 			return err
 		}
 	}
