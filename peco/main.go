@@ -77,9 +77,8 @@ func (peco *Peco) Callback(w http.ResponseWriter, req *http.Request) {
 			}
 
 		case linebot.EventTypePostback:
-			switch event.Postback.Data {
-			case "":
-			default:
+			if err := peco.postbackResponse(message, event.ReplyToken); err != nil {
+				log.Print(err)
 			}
 		}
 	}
@@ -94,14 +93,14 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 			linebot.NewTextMessage("行きたい！行きたい！"),
 			ButtonTemplate2(button2[message.Text]),
 		).Do(); err != nil {
-			log.Print(err)
+			return err
 		}
 	case "いただきます！":
 		if _, err = peco.bot.ReplyMessage(
 			reply,
 			ButtonTemplate(button[message.Text]),
 		).Do(); err != nil {
-			log.Print(err)
+			return err
 		}
 	case "ごちそうさま！":
 		if _, err = peco.bot.ReplyMessage(
@@ -109,21 +108,18 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 			linebot.NewTextMessage("ごちそうさまでした"),
 			ButtonTemplate4(button4[message.Text]),
 		).Do(); err != nil {
-			log.Print(err)
+			return err
 		}
 	case "お話しよう！":
 		if _, err = peco.bot.ReplyMessage(
 			reply,
 			ButtonTemplate4(talk[rand.Intn(3)]),
 		).Do(); err != nil {
-			log.Print(err)
+			return err
 		}
 	case "（好感度）":
-		if _, err = peco.bot.ReplyMessage(
-			reply,
-			linebot.NewTextMessage(formatStr("好感度: ", peco.favoRate)),
-		).Do(); err != nil {
-			log.Print(err)
+		if err := messageResponse(reply, formatStr("好感度: peco.favoRate")); err != nil {
+			return err
 		}
 	default:
 	}
@@ -234,4 +230,14 @@ func GeometReq(url string) (*Geocoding, error) {
 	}
 
 	return &geo, nil
+}
+
+func (peco *Peco) messageResponse(replyToken, text string) error {
+	if _, err := peco.bot.ReplyMessage(
+		replyToken,
+		linebot.NewTextMessage(text),
+	).Do(); err != nil {
+		return err
+	}
+	return nil
 }
