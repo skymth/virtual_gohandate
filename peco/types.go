@@ -66,9 +66,10 @@ func init() {
 
 	button = map[string]buttonTemp{
 		"いただきます！": buttonTemp{
-			image: "https://i.imgur.com/97XRjTa.png",
-			title: "いただきます♪",
-			label: " ",
+			image:   "https://i.imgur.com/97XRjTa.png",
+			title:   "いただきます♪",
+			label:   " ",
+			select1: " ",
 		},
 	}
 
@@ -91,28 +92,28 @@ func init() {
 		},
 	}
 
-	//	button4 = map[string]buttonTemp4{
-	//		"": buttonTemp4{
-	//			key:     "",
-	//			title:   "",
-	//			image:   "",
-	//			label:   "",
-	//			select1: "",
-	//			select2: "",
-	//			select3: "",
-	//			select4: "",
-	//		},
-	//		"": buttonTemp4{
-	//			key:     "",
-	//			title:   "",
-	//			image:   "",
-	//			label:   "",
-	//			select1: "",
-	//			select2: "",
-	//			select3: "",
-	//			select4: "",
-	//		},
-	//	}
+	button4 = map[string]buttonTemp4{
+		"ごちそうさま！": buttonTemp4{
+			key:     "review",
+			title:   "美味しかったね！\n味はどうだった？",
+			image:   "https://i.imgur.com/oxoKeI5.png",
+			label:   " ",
+			select1: "★☆☆☆",
+			select2: "★★☆☆",
+			select3: "★★★☆",
+			select4: "★★★★",
+		},
+		"": buttonTemp4{
+			key:     "",
+			title:   "",
+			image:   "",
+			label:   "",
+			select1: "",
+			select2: "",
+			select3: "",
+			select4: "",
+		},
+	}
 
 	talk = map[int]buttonTemp4{
 		0: buttonTemp4{
@@ -154,6 +155,7 @@ func init() {
 		"osusume2": "了解♪",
 		"menu1":    "おぉ！良いね♪\n私もソースカツ丼にしよう！",
 		"menu2":    "おぉ！良いね♪\n私も味噌チャーシューにしよう！",
+		"review":   "また来ようね！",
 	}
 
 }

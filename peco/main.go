@@ -108,14 +108,14 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 		if _, err = peco.bot.ReplyMessage(
 			reply,
 			linebot.NewTextMessage("ごちそうさまでした"),
-			ButtonTemplate4(button4[message.Text]),
+			ButtonTemplate4(button4[message.Text], false),
 		).Do(); err != nil {
 			return err
 		}
 	case "お話しよう！":
 		if _, err = peco.bot.ReplyMessage(
 			reply,
-			ButtonTemplate4(talk[rand.Intn(3)]),
+			ButtonTemplate4(talk[rand.Intn(3)], true),
 		).Do(); err != nil {
 			return err
 		}
@@ -152,7 +152,7 @@ func (peco *Peco) locationResponse(message *linebot.LocationMessage, reply strin
 
 func postbackResponse(p *linebot.Postback, reply string) error {
 	switch p.Data {
-	case "meshi1", "meshi2", "osusume2", "menu1", "menu2":
+	case "meshi1", "meshi2", "osusume2", "menu1", "menu2", "review":
 		if err := messageResponse(reply, word[p.Data]); err != nil {
 			return err
 		}
@@ -169,7 +169,7 @@ func ButtonTemplate(res buttonTemp) *linebot.TemplateMessage {
 		res.image,
 		res.title,
 		res.label,
-		linebot.NewPostbackTemplateAction(" ", " ", ""),
+		linebot.NewPostbackTemplateAction(res.select1, " ", ""),
 	)
 	return linebot.NewTemplateMessage("button", temp)
 }
@@ -185,16 +185,28 @@ func ButtonTemplate2(res buttonTemp2) *linebot.TemplateMessage {
 	return linebot.NewTemplateMessage("button2", temp)
 }
 
-func ButtonTemplate4(res buttonTemp4) *linebot.TemplateMessage {
-	temp := linebot.NewButtonsTemplate(
-		res.image,
-		res.title,
-		res.label,
-		linebot.NewPostbackTemplateAction(res.select1, formatStr(res.key, 1), ""),
-		linebot.NewPostbackTemplateAction(res.select2, formatStr(res.key, 2), ""),
-		linebot.NewPostbackTemplateAction(res.select3, formatStr(res.key, 3), ""),
-		linebot.NewPostbackTemplateAction(res.select4, formatStr(res.key, 4), ""),
-	)
+func ButtonTemplate4(res buttonTemp4, caset bool) *linebot.TemplateMessage {
+	if caset {
+		temp := linebot.NewButtonsTemplate(
+			res.image,
+			res.title,
+			res.label,
+			linebot.NewPostbackTemplateAction(res.select1, formatStr(res.key, 1), ""),
+			linebot.NewPostbackTemplateAction(res.select2, formatStr(res.key, 2), ""),
+			linebot.NewPostbackTemplateAction(res.select3, formatStr(res.key, 3), ""),
+			linebot.NewPostbackTemplateAction(res.select4, formatStr(res.key, 4), ""),
+		)
+	} else {
+		temp := linebot.NewButtonsTemplate(
+			res.image,
+			res.title,
+			res.label,
+			linebot.NewPostbackTemplateAction(res.select1, res.key, ""),
+			linebot.NewPostbackTemplateAction(res.select2, res.key, ""),
+			linebot.NewPostbackTemplateAction(res.select3, res.key, ""),
+			linebot.NewPostbackTemplateAction(res.select4, res.key, ""),
+		)
+	}
 	return linebot.NewTemplateMessage("button4", temp)
 }
 
