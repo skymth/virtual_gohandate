@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -80,18 +79,17 @@ func ResponseCall(w http.ResponseWriter, req *http.Request) {
 		case linebot.EventTypeMessage:
 			switch message := event.Message.(type) {
 			case *linebot.LocationMessage:
-				la := strconv.FormatFloat(message.Latitude, 'f', 6, 64)
-				lo := strconv.FormatFloat(message.Longitude, 'f', 6, 64)
-				lat, _ := strconv.ParseFloat(la, 64)
-				lon, _ := strconv.ParseFloat(lo, 64)
+				lat := message.Latitude
+				lon := message.Longitude
 
-				max := Locs{}
-				min := Locs{}
-				max.Lat = geometry.Results[0].GeoRes.Location.Lat + 0.0040000
-				max.Lng = geometry.Results[0].GeoRes.Location.Lng + 0.0020000
-
-				min.Lat = geometry.Results[0].GeoRes.Location.Lat - 0.0040000
-				min.Lng = geometry.Results[0].GeoRes.Location.Lng - 0.0020000
+				max := Locs{
+					Lat: geometry.Results[0].GeoRes.Location.Lat + 0.0040000,
+					Lng: geometry.Results[0].GeoRes.Location.Lng + 0.0020000,
+				}
+				min := Locs{
+					Lat: geometry.Results[0].GeoRes.Location.Lat - 0.0040000,
+					Lng: geometry.Results[0].GeoRes.Location.Lng - 0.0020000,
+				}
 
 				if (lat >= min.Lat && lat <= max.Lat) && (lon >= min.Lng && lon <= max.Lng) {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("近くにいるね")).Do(); err != nil {
