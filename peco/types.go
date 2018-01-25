@@ -28,9 +28,11 @@ type Locs struct {
 }
 
 type buttonTemp struct {
-	image string
-	title string
-	label string
+	key     string
+	image   string
+	title   string
+	label   string
+	select1 string
 }
 
 type buttonTemp2 struct {
@@ -66,10 +68,25 @@ func init() {
 
 	button = map[string]buttonTemp{
 		"いただきます！": buttonTemp{
+			key:     " ",
 			image:   "https://i.imgur.com/97XRjTa.png",
 			title:   "いただきます♪",
 			label:   " ",
 			select1: " ",
+		},
+		"so-su": buttonTemp{
+			key:     "menu1",
+			image:   "https://img.retty.me/img_repo/l/01/11709105.jpg",
+			title:   "味の里　しおえ",
+			label:   "ソースカツ丼",
+			select1: "これにする!",
+		},
+		"miso": buttonTemp{
+			key:     "menu2",
+			image:   "https://i.imgur.com/9Oam9dS.jpg",
+			title:   "味の里　しおえ",
+			label:   "味噌チャーシュー",
+			select1: "これにする!",
 		},
 	}
 

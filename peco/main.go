@@ -120,7 +120,7 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 			return err
 		}
 	case "（好感度）":
-		if err := messageResponse(reply, formatStr("好感度: peco.favoRate")); err != nil {
+		if err := peco.messageResponse(reply, formatStr("好感度: ", peco.favoRate)); err != nil {
 			return err
 		}
 	default:
@@ -150,14 +150,14 @@ func (peco *Peco) locationResponse(message *linebot.LocationMessage, reply strin
 	return nil
 }
 
-func postbackResponse(p *linebot.Postback, reply string) error {
+func (peco *Peco) postbackResponse(p *linebot.Postback, reply string) error {
 	switch p.Data {
 	case "meshi1", "meshi2", "osusume2", "menu1", "menu2", "review":
-		if err := messageResponse(reply, word[p.Data]); err != nil {
+		if err := peco.messageResponse(reply, word[p.Data]); err != nil {
 			return err
 		}
 	case "osusume1":
-		if err := CarouselTemplate(reply, p.Data); err != nil {
+		if err := peco.carouselResponse(reply); err != nil {
 			return err
 		}
 	}
@@ -169,7 +169,7 @@ func ButtonTemplate(res buttonTemp) *linebot.TemplateMessage {
 		res.image,
 		res.title,
 		res.label,
-		linebot.NewPostbackTemplateAction(res.select1, " ", ""),
+		linebot.NewPostbackTemplateAction(res.select1, res.key, ""),
 	)
 	return linebot.NewTemplateMessage("button", temp)
 }
@@ -186,8 +186,9 @@ func ButtonTemplate2(res buttonTemp2) *linebot.TemplateMessage {
 }
 
 func ButtonTemplate4(res buttonTemp4, caset bool) *linebot.TemplateMessage {
+	var temp *linebot.ButtonsTemplate
 	if caset {
-		temp := linebot.NewButtonsTemplate(
+		temp = linebot.NewButtonsTemplate(
 			res.image,
 			res.title,
 			res.label,
@@ -197,7 +198,7 @@ func ButtonTemplate4(res buttonTemp4, caset bool) *linebot.TemplateMessage {
 			linebot.NewPostbackTemplateAction(res.select4, formatStr(res.key, 4), ""),
 		)
 	} else {
-		temp := linebot.NewButtonsTemplate(
+		temp = linebot.NewButtonsTemplate(
 			res.image,
 			res.title,
 			res.label,
@@ -208,6 +209,32 @@ func ButtonTemplate4(res buttonTemp4, caset bool) *linebot.TemplateMessage {
 		)
 	}
 	return linebot.NewTemplateMessage("button4", temp)
+}
+
+func (peco *Peco) carouselResponse(reply string) error {
+	var columns []*linebot.CarouselColumn
+	columns = append(columns, NewColum(button["so-su"]))
+	columns = append(columns, NewColum(button["miso"]))
+	if _, err := peco.bot.ReplyMessage(
+		reply,
+		CarouselTemplate(columns),
+	).Do(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func CarouselTemplate(columns []*linebot.CarouselColumn) *linebot.TemplateMessage {
+	return linebot.NewTemplateMessage("carousel", linebot.NewCarouselTemplate(columns...))
+}
+
+func NewColum(res buttonTemp) *linebot.CarouselColumn {
+	return linebot.NewCarouselColumn(
+		res.image,
+		res.title,
+		res.label,
+		linebot.NewPostbackTemplateAction(res.select1, res.key, ""),
+	)
 }
 
 func handleLocation(lat, lon float64) (*linebot.TemplateMessage, bool, error) {
