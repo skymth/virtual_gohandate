@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -114,6 +113,7 @@ func (peco *Peco) textResponse(message *linebot.TextMessage, reply string) error
 			return err
 		}
 	case "お話しよう！":
+
 		if _, err = peco.bot.ReplyMessage(
 			reply,
 			ButtonTemplate4(talk[rand.Intn(3)], true),
@@ -324,6 +324,5 @@ func (peco *Peco) talkResponse(reply string, res TalkRes) error {
 }
 
 func stickerRandom() *linebot.StickerMessage {
-	rand.Seed(time.Now().UnixNano())
 	return linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1))
 }
