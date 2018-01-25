@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -160,6 +161,10 @@ func (peco *Peco) postbackResponse(p *linebot.Postback, reply string) error {
 		if err := peco.carouselResponse(reply); err != nil {
 			return err
 		}
+	case "shiro1", "shiro2", "shiro3", "shiro4", "kyodo1", "kyodo2", "kyodo3", "kyodo4", "men1", "men2", "men3", "men4":
+		if err := peco.talkResponse(reply, talkres[p.Data]); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -295,4 +300,30 @@ func (peco *Peco) messageResponse(replyToken, text string) error {
 		return err
 	}
 	return nil
+}
+
+func (peco *Peco) talkResponse(reply string, res TalkRes) error {
+	if res.image != "" {
+		if _, err := peco.bot.ReplyMessage(
+			reply,
+			linebot.NewTextMessage(res.text),
+			linebot.NewImageMessage(res.image, res.image),
+		).Do(); err != nil {
+			return err
+		}
+	} else {
+		if _, err := peco.bot.ReplyMessage(
+			reply,
+			linebot.NewTextMessage(res.text),
+			stickerRandom(),
+		).Do(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func stickerRandom() *linebot.StickerMessage {
+	rand.Seed(time.Now().UnixNano())
+	return linebot.NewStickerMessage("1", fmt.Sprintf("%d", rand.Intn(18)+1))
 }
